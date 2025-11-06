@@ -12,10 +12,9 @@ USERNAME   = os.getenv("BW_EMAIL")
 PASSWORD   = os.getenv("BW_PASSWORD")
 PROJECT    = os.getenv("BW_PROJECT")
 QUERY_NAME = os.getenv("BW_QUERY_NAME")
-TOKEN_PATH = os.getenv("TOKEN_PATH")
 
 def get_project() -> BWProject:
-    return BWProject(project=PROJECT, username=USERNAME, password=PASSWORD, token_path=TOKEN_PATH)
+    return BWProject(project=PROJECT, username=USERNAME, password=PASSWORD)
 
 
 def iter_mentions_pages(name: str, startDate: str, endDate: str, pagesize: int = 5000) -> Generator[List[dict], None, None]:

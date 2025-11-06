@@ -53,46 +53,22 @@ def download():
     end_iso = end_dt.isoformat().replace("+00:00", "Z")
 
     query_name = os.getenv("BW_QUERY_NAME")
-    filename = f"mentions_{start_dt.strftime('%Y%m%dT%H%M%S')}.xlsx"
+    filename = f"mentions_{start_dt.strftime('%Y%m%dT%H%M%S')}.csv"
 
     def generator():
-        wb = Workbook(write_only=True)
-        ws = wb.create_sheet()
-        header_written = False
-
+        first = True
         for page in bw_main.iter_mentions_pages(name=query_name, startDate=start_iso, endDate=end_iso, pagesize=5000):
             if not page:
                 continue
             df = pd.json_normalize(page)
-            if not header_written:
-                ws.append(list(df.columns))
-                header_written = True
-            for row in df.itertuples(index=False, name=None):
-                ws.append(list(row))
-
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
-        tmp_name = tmp.name
-        tmp.close()
-        wb.save(tmp_name)
-
-        try:
-            with open(tmp_name, "rb") as f:
-                chunk_size = 65536
-                while True:
-                    chunk = f.read(chunk_size)
-                    if not chunk:
-                        break
-                    yield chunk
-        finally:
-            try:
-                os.remove(tmp_name)
-            except Exception:
-                pass
+            csv_chunk = df.to_csv(index=False, header=first)
+            first = False
+            yield csv_chunk
 
     headers = {
         "Content-Disposition": f'attachment; filename="{filename}"'
     }
-    return Response(stream_with_context(generator()), mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers=headers)
+    return Response(stream_with_context(generator()), mimetype="text/csv", headers=headers)
 
 @app.route("/", methods=["GET"])
 def index():

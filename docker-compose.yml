@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  brandwatch-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - BW_EMAIL=${BW_EMAIL}
+      - BW_PASSWORD=${BW_PASSWORD}
+      - BW_PROJECT=${BW_PROJECT}
+      - BW_QUERY_NAME=${BW_QUERY_NAME}
+      - PORT=8080
+    volumes:
+      - .:/app

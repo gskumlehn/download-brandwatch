@@ -1,0 +1,7 @@
+Flask>=2.0
+python-dotenv
+pandas
+gunicorn
+bcr_api
+openpyxl
+Flask-Cors
